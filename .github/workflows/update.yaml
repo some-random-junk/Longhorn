@@ -1,0 +1,32 @@
+name: Update Radar Image
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # Every 10 minutes
+  workflow_dispatch:        # Manual run option
+
+jobs:
+  update-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run script to download radar
+        run: python fetch_and_save.py
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add radar/IDR703.gif
+          git commit -m "Update radar image" || echo "No changes"
+          git push
